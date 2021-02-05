@@ -1,5 +1,3 @@
-actualCapacity = 0
-sensorDoor = False
 
 class Column:
     def __init__(self, _ID, _status, _amountOfFloors, _amountOfElevators):
@@ -12,29 +10,29 @@ class Column:
         self.createElevator(_amountOfElevators)
         self.createCallButtons(_amountOfFloors)
 
-    
+    #Through this method we create the elevators
     def createElevator(self, _amountOfElevators):
-        for i in range(_amountOfElevators):
-            elevator = Elevator (i + 1, "idle", self.amountOfFloors, 1)
+        for elevatorID in range(_amountOfElevators):
+            elevator = Elevator (elevatorID + 1, "idle", self.amountOfFloors, 1)
             self.elevatorsList.append(elevator)
         
-
+    #Through this method we create the buttons, Up and Down 
     def createCallButtons(self, _amountOfFloors):
         callButtonID = 1
         for buttonFloor in range(_amountOfFloors):
-            if buttonFloor + 1 < _amountOfFloors:
+            if buttonFloor + 1 < _amountOfFloors: #Ensures that on the last floor you don't have an up button.
                 callButton = CallButton (callButtonID, "OFF", buttonFloor + 1, "up")
                 self.callButtonsList.append(callButton)
                 callButtonID += 1            
-            if buttonFloor + 1 > 1:
+            if buttonFloor + 1 > 1: #Ensures that on the first floor you don't have a down button.
                 callButton = CallButton (callButtonID, "OFF", buttonFloor + 1, "down")
                 self.callButtonsList.append(callButton)
                 callButtonID += 1
 
-
+    #Through this method, we will handle the request for an elevator
     def requestElevator(self, _floor, _direction):
         elevator = self.findBestElevator(_floor, _direction)
-        print("Chosen elevator: " + str(elevator.ID))
+        #print("Chosen elevator: " + str(elevator.ID))
         elevator.floorRequestList.append(_floor)
         elevator.sortFloorList()
         elevator.capacityCalculate()
@@ -42,32 +40,34 @@ class Column:
 
         return elevator 
         
-
-
+    #Through this method we will score the best elevator, taking into account proximity, direction and its status
     def findBestElevator(self, _floor, _direction):
-
         bestElevatorInfo = type('obj', (object,),{'bestElevator': None, 'bestScore': 5, 'referanceGap': 10000000})
 
         for elevator in self.elevatorsList:
+            #The elevator is at my floor and going in the direction I want
             if _floor == elevator.currentFloor and elevator.status == "stopped" and  elevator.direction == _direction:
                 bestElevatorInfo = self.checkIfElevatorISBetter(1, elevator, bestElevatorInfo, _floor)            
 
+             #The elevator is lower than me, is coming up and I want to go up
             elif _floor > elevator.currentFloor  and elevator.direction == "up" and  elevator.direction == _direction:
                 bestElevatorInfo = self.checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _floor)
             
+             #The elevator is higher than me, is coming down and I want to go down
             elif _floor < elevator.currentFloor and elevator.direction == "down" and  elevator.direction == _direction:
                 bestElevatorInfo = self.checkIfElevatorISBetter(2, elevator, bestElevatorInfo, _floor)
             
+             #The elevator is idle
             elif elevator.status == "idle":
                 bestElevatorInfo = self.checkIfElevatorISBetter(3, elevator, bestElevatorInfo, _floor)
             
+             #The elevator is not available, but still could take the call nothing else better is found
             else:
-                bestElevatorInfo = self.checkIfElevatorISBetter(4, elevator, bestElevatorInfo, _floor)
-            
+                bestElevatorInfo = self.checkIfElevatorISBetter(4, elevator, bestElevatorInfo, _floor)            
         
         return bestElevatorInfo.bestElevator
 
-     
+    #Through this method we will analyze the scores of the method above and select the best one
     def checkIfElevatorISBetter(self, scoreToCheck, newElevator, bestElevatorInfo, floor):
         if scoreToCheck < bestElevatorInfo.bestScore:
             bestElevatorInfo.bestScore = scoreToCheck
@@ -98,7 +98,7 @@ class Elevator:
         self.createFloorRequestButton(_amountOfFloors)
         self.sortFloorList()
 
-
+    #Through this method we create the internal buttons of the elevators
     def createFloorRequestButton(self, _amountOfFloors):
         floorRequestButtonID = 1
         for buttonFloor in range(_amountOfFloors):
@@ -106,6 +106,7 @@ class Elevator:
             self.floorRequestButtonsList.append(floorRequestButton)
             floorRequestButtonID += 1
 
+    #Through this method, we will handle the request for a floor
     def requestFloor(self, _floor):
         self.floorRequestList.append(_floor)
         self.sortFloorList()
@@ -120,64 +121,64 @@ class Elevator:
         self.capacityCalculate()
         self.movElev(_floor, _direction)
 
-
+    #Through this sequence we can move the elevator
     def movElev(self, _floor, _direction):
+        #Check elevator capacity, as long as it is not safe, it will not move
         while self.capacityStatus != "operating":
             self.capacityCalculate()
         
+        #Check if the door is closed to move the elevator
         while len(self.floorRequestList) != 0:
             self.operateDoors("closed")
-            if self.door.status == "closed":
-                print("Door without obstruction\n")
-                print("Status door:" + str(self.door.status) + "\n")
-                self.status = "moving"
-                if self.currentFloor > _floor:
+            if self.door.status == "closed": #Check if the door dont' have any obstruction
+                #print("Status door:" + str(self.door.status) + "\n")
+                self.status = "moving" #Changes the status of the elevator when it starts to move
+                if self.currentFloor > _floor: #Defines the direction from the request floor, and its position
                     self.direction = "down"
                 else:
                     self.direction = "up"
                 
                 while self.currentFloor != _floor:
                     if self.direction == "up":
-                        print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status)
+                        #print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status)
                         self.currentFloor += 1
                     elif self.direction == "down":
-                        print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status)
+                        #print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status)
                         self.currentFloor -= 1
 
-                self.status = "stopped"
-                print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status + "\n")
+                self.status = "stopped" #Changes the status of the elevator when it reaches the correct floor
+                #print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status + "\n")
                 self.operateDoors("opened")
-                print("Status door:" + str(self.door.status) + "\n")
+                #print("Status door:" + str(self.door.status) + "\n")
             
             self.floorRequestList.pop(0)
         
-        self.status = "idle"
+        self.status = "idle" #Changes the status of the elevator when it finishes its list of floors to go
     
-
+    #Through this sequence we can sort the list in ascending or descending order, according to the direction the elevator is going
     def sortFloorList(self):
         if self.direction == "up":
             self.floorRequestList = sorted(self.floorRequestList)
         else:
             self.floorRequestList = sorted(self.floorRequestList, reverse = True)
 
-
+    #Through this sequence we check if we are not overweight in the elevator
     def capacityCalculate(self):
+        actualCapacity = 0  #External data
         if actualCapacity <= self.maxCapacity:
             self.capacityStatus = "operating"
-            self.displayCapacity = actualCapacity
-            print("\nCapacity display: Safe")
-
+            self.displayCapacity = "Capacity display: Safe"
         else:
             self.capacityStatus = "overloaded"
             self.displayCapacity = "Exceeded weight, authorized weight is" + self.maxCapacity + "lbs"
-            print(self.displayCapacity)
         
-    
+    #Through this sequence we can verify that there is no obstruction in the door
     def operateDoors(self, _command):
+        sensorDoor = False  #External data
         if sensorDoor == False:
             self.door.status = _command
-        else:
-            print("Blocked door")
+        #else:
+            #print("Blocked door")
                     
 class CallButton:
     def __init__(self, _ID, _status, _floor, _direction):
@@ -333,6 +334,6 @@ def scenario3():
     print("Request Floor: 3")
     person2.requestFloor(3)
 
-scenario1()
+# scenario1()
 # scenario2()
 # scenario3()
