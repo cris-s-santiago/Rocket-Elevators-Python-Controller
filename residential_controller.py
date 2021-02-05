@@ -26,7 +26,7 @@ class Column:
                 callButton = CallButton (callButtonID, "OFF", buttonFloor + 1, "up")
                 self.callButtonsList.append(callButton)
                 callButtonID += 1            
-            elif buttonFloor + 1 > 1:
+            if buttonFloor + 1 > 1:
                 callButton = CallButton (callButtonID, "OFF", buttonFloor + 1, "down")
                 self.callButtonsList.append(callButton)
                 callButtonID += 1
@@ -49,7 +49,7 @@ class Column:
         bestElevatorInfo = type('obj', (object,),{'bestElevator': None, 'bestScore': 5, 'referanceGap': 10000000})
 
         for elevator in self.elevatorsList:
-            if _floor == elevator.currentFloor and elevator.status == "stopped" and _direction == elevator.direction:
+            if _floor == elevator.currentFloor and elevator.status == "stopped" and  elevator.direction == _direction:
                 bestElevatorInfo = self.checkIfElevatorISBetter(1, elevator, bestElevatorInfo, _floor)            
 
             elif _floor > elevator.currentFloor  and elevator.direction == "up" and  elevator.direction == _direction:
@@ -105,7 +105,6 @@ class Elevator:
             floorRequestButton = FloorRequestButton(floorRequestButtonID, "OFF", buttonFloor + 1)
             self.floorRequestButtonsList.append(floorRequestButton)
             floorRequestButtonID += 1
-
 
     def requestFloor(self, _floor):
         self.floorRequestList.append(_floor)
@@ -233,7 +232,7 @@ def scenario1():
     createTest()
     print('Scenario 1: ')
     print('Elevator A is idle at floor 2' + '\n' 
-            + 'Elevator B is idle at floor 6.' +'\n')
+            + 'Elevator B is idle at floor 6' +'\n')
 
     column1.elevatorsList[0].currentFloor = 2
     column1.elevatorsList[0].status = "idle"
@@ -251,10 +250,10 @@ def scenario1():
 
     print("Request Elevator from floor: 3 and direction: up")
 
-    elevatorSelected = column1.requestElevator(3, "up")
+    person1 = column1.requestElevator(3, "up")
 
     print("Request Floor: 7")
-    elevatorSelected.requestFloor(7)
+    person1.requestFloor(7)
 
 
 #//=========== scenario2 ===============\\
@@ -280,19 +279,19 @@ def scenario2():
 
 
     print("Request Elevator from floor: 1 and direction: up")
-    Person1 = column1.requestElevator(1, "up")
+    person1 = column1.requestElevator(1, "up")
     print("Request Floor: 6")
-    Person1.requestFloor(6)
+    person1.requestFloor(6)
 
     print("2 minutes later, request Elevator from floor: 3 and direction: up")
-    Person2 = column1.requestElevator(3, "up")
+    person2 = column1.requestElevator(3, "up")
     print("Request Floor: 5")
-    Person2.requestFloor(5)
+    person2.requestFloor(5)
 
     print("Finally, request Elevator from floor: 9 and direction: down")
-    Person3 = column1.requestElevator(9, "down")
+    person3 = column1.requestElevator(9, "down")
     print("Request Floor: 2")
-    Person3.requestFloor(2)
+    person3.requestFloor(2)
 
 
 #//=========== scenario3 ===============\\
@@ -318,9 +317,9 @@ def scenario3():
 
 
     print("Request Elevator from floor: 3 and direction: down")
-    Person1 = column1.requestElevator(3, "down")
+    person1 = column1.requestElevator(3, "down")
     print("Request Floor: 2")
-    Person1.requestFloor(2)
+    person1.requestFloor(2)
 
     column1.elevatorsList[1].currentFloor = 6
     column1.elevatorsList[1].status = "idle"
@@ -331,10 +330,10 @@ def scenario3():
             + "Current Floor: " + str(column1.elevatorsList[1].currentFloor) + "\n")
 
     print("5 minutes later, request Elevator from floor: 10 and direction: down")
-    Person2 = column1.requestElevator(10, "down")
+    person2 = column1.requestElevator(10, "down")
     print("Request Floor: 3")
-    Person2.requestFloor(3)
+    person2.requestFloor(3)
 
-#scenario1()
-#scenario2()
-scenario3()
+# scenario1()
+# scenario2()
+# scenario3()
