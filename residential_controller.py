@@ -143,10 +143,9 @@ class Elevator:
                     elif self.direction == "down":
                         print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status)
                         self.currentFloor -= 1
-                    
-                
-                print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status + "\n")
+
                 self.status = "stopped"
+                print("Elevator current floor: " + str(self.currentFloor) + "   ||     Status: " + self.status + "\n")
                 self.operateDoors("opened")
                 print("Status door:" + str(self.door.status) + "\n")
             
@@ -334,6 +333,6 @@ def scenario3():
     print("Request Floor: 3")
     person2.requestFloor(3)
 
-# scenario1()
+scenario1()
 # scenario2()
 # scenario3()
